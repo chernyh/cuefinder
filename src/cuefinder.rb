@@ -94,14 +94,14 @@ end
 
 file_name=ARGV[0]
 #file_name="Armin van Buuren presents - A State of Trance Episode 430.mp3##"
-file_name="Markus Schulz - Global DJ Broadcast (2010-03-11) [PS].mp3"
+#file_name="Markus Schulz - Global DJ Broadcast (2010-03-11) [PS].mp3"
 
 if(file_name != nil) then
 #  ap=ASOTParser.new(file_name )
   ap=MarkusShultzParser.new(file_name )
   cue_file=ap.download_cue()
   if cue_file!=nil then
-    ret=system("mp3splt -c #{cue_file} #{file_name }")
+    ret=system("mp3splt -c #{cue_file} #{file_name.gsub(" ", "_")}")
     if (!ret) then
       puts "could not split mp3 file"
     end
@@ -111,4 +111,3 @@ if(file_name != nil) then
 else
   puts "Please provide file name"
 end
-
