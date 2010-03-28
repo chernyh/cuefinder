@@ -43,5 +43,12 @@ cf.parse_url_to_cue_file(html,"25-03-2010")
 
 end
 
+def testFileNamesWithSpaces
+  cue_file_name=ARGV[0]
+  mp3_file_name=ARGV[1]
+  call_mp3splt(cue_file_name,mp3_file_name)
+end
 
-system("mp3splt -c cue.cue /mnt/multimedia/_RADIOSHOW_/Global\\ DJ\\ Broadcast\\ -\\ Markus\\ Schulz/2010-03-25/Markus\\ Schulz\\ presents\\ -\\ Global\\ DJ\\ Broadcast\\ WMC\\ Special\\ \\(25\\ March\\ 2010\\).mp3")
+
+
+testFileNamesWithSpaces
