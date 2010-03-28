@@ -3,10 +3,9 @@ require "uri"
 require "net/http"
 require "date"
 require "pathname"
+require 'etc'
 
 
-PROXY_ADDR = ''
-PROXY_PORT = ''
 
 class CueFinder
 
@@ -18,19 +17,38 @@ class CueFinder
     basename = "#{p.basename(".mp3")}"
     @cue_file_name="#{basename}.cue"
 
+    path_to_config=Etc.getpwuid.dir+"/.cuefinder"
+    if(!File.exist?(path_to_config))
+      raise "Please provide proxy settings in ~/.cuefinder"
+    end
+    props = load_properties(path_to_config)
+    @proxy_host =props["proxy_host"];
+    @proxy_port =props["proxy_port"];
+    puts "using proxy: #{@proxy_host}:#{@proxy_port}"
+
   end
 
-  def cue_file_name
-    return @cue_file_name
-  end
-  
-  def mp3_file_name
-    return @mp3Filename
+  def load_properties(properties_filename)
+    properties = {}
+    File.open(properties_filename, 'r') do |properties_file|
+      properties_file.read.each_line do |line|
+        line.strip!
+        if (line[0] != ?# and line[0] != ?=)
+          i = line.index('=')
+          if (i)
+            properties[line[0..i - 1].strip] = line[i + 1..-1].strip
+          else
+            properties[line] = ''
+          end
+        end
+      end
+    end
+    properties
   end
 
   def get(url)
     puts "downloading url: #{url}"
-    browser=Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT).start(@start_page)
+    browser=Net::HTTP::Proxy(@proxy_host , @proxy_port).start(@start_page)
     res=browser.get(url, {"Referer" => "http://cuenation.com/?page=cues&folder=gdjb"})
     return res.body
   end
@@ -54,6 +72,23 @@ class CueFinder
     end
   end
 
+  def call_mp3splt(cue_file_name,mp3_file_name)
+    cmd = "mp3splt -c \"#{cue_file_name}\" \"#{mp3_file_name}\""
+    puts cmd
+    ret=system(cmd)
+    if (!ret) then
+      puts "could not split mp3 file: #{mp3_file_name}"
+    end
+  end
+
+  def process
+    cue_file=download_cue()
+    if cue_file!=nil then
+      call_mp3splt(@cue_file_name,@mp3_file_name)
+    else
+      puts "could not find cue sheet for: #{@mp3_file_name}"
+    end
+  end
 
 end
 
@@ -117,11 +152,18 @@ class MarkusShultzParser < CueFinder
 end
 
 
-def call_mp3splt(cue_file_name,mp3_file_name)
-  cmd = "mp3splt -c \"#{cue_file_name}\" \"#{mp3_file_name}\""
-  puts cmd
-  ret=system(cmd)
-  if (!ret) then
-    puts "could not split mp3 file: #{mp3_file_name}"
+class CueFinderFactory
+
+  def self.make_cuefinder(file_name)
+    if(file_name.index("Markus")!=nil) then
+      return MarkusShultzParser.new(file_name )
+    else if(file_name.index("Armin")!=nil) then
+        return ASOTParser.new(file_name )
+      else
+        return nil
+      end
+    end
   end
+
 end
+
