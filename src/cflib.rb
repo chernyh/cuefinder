@@ -2,6 +2,7 @@
 require "uri"
 require "net/http"
 require "date"
+require "pathname"
 
 
 PROXY_ADDR = ''
@@ -13,8 +14,18 @@ class CueFinder
     @mp3Filename=mp3Filename
     @start_page=start_page
     @radioshow_folder_path=radioshow_folder_path
-    @cue_file_name="cue.cue"
+    p = Pathname.new(mp3Filename)
+    basename = "#{p.basename(".mp3")}"
+    @cue_file_name="#{basename}.cue"
 
+  end
+
+  def cue_file_name
+    return @cue_file_name
+  end
+  
+  def mp3_file_name
+    return @mp3Filename
   end
 
   def get(url)
@@ -33,8 +44,9 @@ class CueFinder
       content=get(cue_url)
       f=File.new(@cue_file_name,"w")
       f.write(content)
+      f.close
       puts "cue file saved to #{@cue_file_name}"
-      puts "#{content}"
+      #      puts "#{content}#"
       return @cue_file_name
     else
       puts "release no could not be parsed, sorry"
@@ -77,16 +89,16 @@ class MarkusShultzParser < CueFinder
     release_no=@mp3Filename.scan /Global DJ Broadcast \((.*)\).*\.mp3/
 
     if(release_no[0] == nil) then 
-#another pattern
-puts "trying 2nd pattern"
-        release_no=@mp3Filename.scan /\((.*)\)\.mp3/
-        #extract from array
-        release_no=release_no[0][0]
-#25 March 2010
-        d,m,y=release_no.split(" ")
-#March -> "03"
-        m_number=Date::MONTHNAMES.index(m).to_s.rjust(2,"0")
-        release_no="#{d}-#{m_number}-#{y}"
+      #another pattern
+      puts "trying 2nd pattern"
+      release_no=@mp3Filename.scan /\((.*)\)\.mp3/
+      #extract from array
+      release_no=release_no[0][0]
+      #25 March 2010
+      d,m,y=release_no.split(" ")
+      #March -> "03"
+      m_number=Date::MONTHNAMES.index(m).to_s.rjust(2,"0")
+      release_no="#{d}-#{m_number}-#{y}"
     end
 
     puts "Global DJ Broadcast release is '#{release_no}'"
@@ -102,4 +114,14 @@ puts "trying 2nd pattern"
     return url
   end
 
+end
+
+
+def call_mp3splt(cue_file_name,mp3_file_name)
+  cmd = "mp3splt -c \"#{cue_file_name}\" \"#{mp3_file_name}\""
+  puts cmd
+  ret=system(cmd)
+  if (!ret) then
+    puts "could not split mp3 file: #{mp3_file_name}"
+  end
 end
