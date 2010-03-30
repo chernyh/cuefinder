@@ -73,7 +73,6 @@ class CueFinder
   end
 
   def call_mp3splt(cue_file_name,mp3_file_name)
-puts "mp3_file_name: #{mp3_file_name}" 
     p=Pathname.new( mp3_file_name)
     cmd = "mp3splt -c \"#{cue_file_name}\" -d \"#{p.dirname}\" \"#{mp3_file_name}\""
     puts cmd
@@ -155,19 +154,48 @@ class MarkusShultzParser < CueFinder
 
 end
 
+class MagicIslandParser < CueFinder
+
+  def initialize(mp3Filename)
+    super(mp3Filename,"cuenation.com/","?page=cues&folder=magicisland")
+  end
+
+  def parse_release_no()
+    release_no=@mp3Filename.scan /Episode_([0-9]+)-/
+    release_no=release_no[0][0]
+    puts "Magic Island release is '#{release_no}'"
+    return release_no
+  end
+
+  def parse_url_to_cue_file(text,asotNo)
+    urls=text.scan /(download.php[?]type=cue.*_#{asotNo}_.*\.cue)\"\>\<img/
+    puts "First found url to cue file: #{urls[0]}"
+    url=urls[0][0].gsub("&amp;", "&")
+    return url
+  end
+
+end
+
 
 class CueFinderFactory
 
   def self.make_cuefinder(file_name)
     if(file_name.index("Markus")!=nil) then
       return MarkusShultzParser.new(file_name )
-    else if(file_name.index("Armin")!=nil) then
-        return ASOTParser.new(file_name )
-      else
-        return nil
-      end
     end
-  end
 
+    if(file_name.index("Armin")!=nil) then
+      return ASOTParser.new(file_name )
+    end
+
+    if(file_name.index("Balearic")!=nil) then
+      return MagicIslandParser.new(file_name )
+    end
+
+    return nil
+
+  end
 end
+
+
 

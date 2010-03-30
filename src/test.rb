@@ -51,6 +51,27 @@ ENDOF_URL
 
     file_name = "Armin van Buuren presents - A State of Trance Episode 430.mp3"
     assert_instance_of(ASOTParser, CueFinderFactory.make_cuefinder(file_name))
+
+    file_name = "DJ_Shah_-_Magic_Island_-_Music_for_Balearic_People_Episode_004-NET-23-05-2008-iRUSH.mp3"
+    assert_instance_of(MagicIslandParser, CueFinderFactory.make_cuefinder(file_name))
   end
-  
+
+  def test_MagicIsland_parse_release_no
+    file_name = "DJ_Shah_-_Magic_Island_-_Music_for_Balearic_People_Episode_004-NET-23-05-2008-iRUSH"
+    cf=MagicIslandParser.new( file_name )
+    rel_no=cf.parse_release_no( )
+    assert_equal("004", rel_no)
+  end
+  def test_MagicIsland_parse_cue_url
+
+    cf=MagicIslandParser.new( "" )
+    html =<<ENDOF_URL
+    <a href="download.php?type=cue&amp;folder=magicisland&amp;filename=01-roger_shah_magic_island_-_music_for_balearic_people_098_%28di.fm%29_26-03-2010-tt.cue"><img src="layout/download.png" alt="Download!" /></a> <a href="?page=tracklist&amp;folder=magicisland&amp;filename=01-roger_shah_magic_island_-_music_for_balearic_people_098_%28di.fm%29_26-03-2010-tt.cue"> Magic Island - Music for Balearic People 098 (2010-03-26) [TT]</a><br />
+ENDOF_URL
+
+    url=cf.parse_url_to_cue_file(html,"098")
+    
+    assert_equal("download.php?type=cue&folder=magicisland&filename=01-roger_shah_magic_island_-_music_for_balearic_people_098_%28di.fm%29_26-03-2010-tt.cue", url)
+  end
+
 end
