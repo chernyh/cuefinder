@@ -73,20 +73,24 @@ class CueFinder
   end
 
   def call_mp3splt(cue_file_name,mp3_file_name)
-    cmd = "mp3splt -c \"#{cue_file_name}\" \"#{mp3_file_name}\""
+puts "mp3_file_name: #{mp3_file_name}" 
+    p=Pathname.new( mp3_file_name)
+    cmd = "mp3splt -c \"#{cue_file_name}\" -d \"#{p.dirname}\" \"#{mp3_file_name}\""
     puts cmd
     ret=system(cmd)
     if (!ret) then
       puts "could not split mp3 file: #{mp3_file_name}"
+    else
+      File.delete(mp3_file_name)
     end
   end
 
   def process
     cue_file=download_cue()
     if cue_file!=nil then
-      call_mp3splt(@cue_file_name,@mp3_file_name)
+      call_mp3splt(@cue_file_name,@mp3Filename)
     else
-      puts "could not find cue sheet for: #{@mp3_file_name}"
+      puts "could not find cue sheet for: #{@mp3Filename}"
     end
   end
 
