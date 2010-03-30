@@ -1,4 +1,9 @@
 #!/usr/bin/ruby
+
+#add local path to search path for require statement, so it can fins cflib.rb
+puts "including #{File.dirname( __FILE__)}"
+$: << File.dirname( __FILE__)
+
 require "uri"
 require "net/http"
 require "cflib"
