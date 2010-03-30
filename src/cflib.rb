@@ -168,7 +168,8 @@ class MagicIslandParser < CueFinder
   end
 
   def parse_url_to_cue_file(text,asotNo)
-    urls=text.scan /(download.php[?]type=cue.*_#{asotNo}_.*\.cue)\"\>\<img/
+    urls=text.scan /(download.php[?]type=cue.*music_for_balearic_people_#{asotNo}_.*\.cue)\"\>\<img/
+
     puts "First found url to cue file: #{urls[0]}"
     url=urls[0][0].gsub("&amp;", "&")
     return url
