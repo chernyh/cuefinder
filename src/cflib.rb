@@ -104,12 +104,19 @@ class ASOTParser < CueFinder
 
   def parse_release_no()
     release_no=@mp3Filename.scan /Episode ([0-9]+)\.mp3/
+    if(release_no[0] == nil) then 
+      #another pattern
+      puts "trying 2nd pattern"
+      release_no=@mp3Filename.scan /Trance[_ ](([0-9]+))[_ -]/
+    end
+    release_no=release_no[0][0]
+    
     puts "ASOT release is '#{release_no}'"
     return release_no
   end
 
   def parse_url_to_cue_file(text,asotNo)
-    urls=text.scan /(download.php[?]type=cue.*_#{asotNo}_.*\.cue)\"\>\<img/
+    urls=text.scan /(download.php[?]type=cue.*#{asotNo}.*\.cue)\"\>\<img/
     puts "First found url to cue file: #{urls[0]}"
     url=urls[0][0].gsub("&amp;", "&")
     return url
@@ -131,14 +138,16 @@ class MarkusShultzParser < CueFinder
       #another pattern
       puts "trying 2nd pattern"
       release_no=@mp3Filename.scan /\((.*)\)\.mp3/
+    end
       #extract from array
       release_no=release_no[0][0]
       #25 March 2010
       d,m,y=release_no.split(" ")
       #March -> "03"
       m_number=Date::MONTHNAMES.index(m).to_s.rjust(2,"0")
+      d=d.rjust(2,"0")
       release_no="#{d}-#{m_number}-#{y}"
-    end
+
 
     puts "Global DJ Broadcast release is '#{release_no}'"
     return release_no
