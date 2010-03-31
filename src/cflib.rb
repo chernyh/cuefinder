@@ -163,6 +163,11 @@ class MagicIslandParser < CueFinder
 
   def parse_release_no()
     release_no=@mp3Filename.scan /Episode ([0-9]+)/
+    if(release_no[0] == nil) then 
+      #another pattern
+      puts "trying 2nd pattern"
+      release_no=@mp3Filename.scan /_([0-9]+)-/
+    end
     release_no=release_no[0][0]
     puts "Magic Island release is '#{release_no}'"
     return release_no
