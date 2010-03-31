@@ -81,6 +81,7 @@ class CueFinder
       puts "could not split mp3 file: #{mp3_file_name}"
     else
       File.delete(mp3_file_name)
+      File.delete(cue_file_name)
     end
   end
 
@@ -161,7 +162,7 @@ class MagicIslandParser < CueFinder
   end
 
   def parse_release_no()
-    release_no=@mp3Filename.scan /Episode_([0-9]+)-/
+    release_no=@mp3Filename.scan /Episode ([0-9]+)/
     release_no=release_no[0][0]
     puts "Magic Island release is '#{release_no}'"
     return release_no
@@ -189,7 +190,7 @@ class CueFinderFactory
       return ASOTParser.new(file_name )
     end
 
-    if(file_name.index("Balearic")!=nil) then
+    if(file_name.index("Shah")!=nil) then
       return MagicIslandParser.new(file_name )
     end
 
