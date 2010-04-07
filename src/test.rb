@@ -31,8 +31,17 @@ ENDOF_URL
     cf=MarkusShultzParser.new( file_name )
     rel_no=cf.parse_release_no()
     puts "releaseNo='#{rel_no}'"
-
+    assert_equal("25-03-2010",rel_no )   
   end
+
+  def test_ParseGDJBRelease3
+    file_name = "Markus_Schulz_presents_-_Global_DJ_Broadcast_World_Tour_1_April_2010.mp3"
+    cf=MarkusShultzParser.new( file_name )
+    rel_no=cf.parse_release_no()
+    puts "releaseNo='#{rel_no}'"
+    assert_equal("01-04-2010",rel_no )   
+  end
+
 
   def test_CueUrlFromHtmlPage
     html= <<ENDOF_URL

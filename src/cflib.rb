@@ -139,8 +139,15 @@ class MarkusShultzParser < CueFinder
       puts "trying 2nd pattern"
       release_no=@mp3Filename.scan /\((.*)\)\.mp3/
     end
+    if(release_no[0] == nil) then 
+      #another pattern
+      puts "trying 3rd pattern"
+      release_no=@mp3Filename.scan /Tour_(.*_.*_.*)\.mp3/
+    end
+
       #extract from array
       release_no=release_no[0][0]
+      release_no=release_no.gsub("_", " ")
       #25 March 2010
       d,m,y=release_no.split(" ")
       #March -> "03"
