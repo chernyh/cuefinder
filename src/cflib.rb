@@ -55,9 +55,10 @@ class CueFinder
 
   def download_cue()
     release_no=parse_release_no()
+    part_no=parse_part_no()
     if(release_no!=nil) then
       html=get(@radioshow_folder_path)
-      cue_url=parse_url_to_cue_file(html,release_no)
+      cue_url=parse_url_to_cue_file(html,release_no,part_no)
       puts "cueUrl is #{cue_url}, downloading"
       content=get(cue_url)
       f=File.new(@cue_file_name,"w")
@@ -115,7 +116,7 @@ class ASOTParser < CueFinder
     return release_no
   end
 
-  def parse_url_to_cue_file(text,asotNo)
+  def parse_url_to_cue_file(text,asotNo,part_no)
     urls=text.scan /(download.php[?]type=cue.*#{asotNo}.*\.cue)\"\>\<img/
     puts "First found url to cue file: #{urls[0]}"
     url=urls[0][0].gsub("&amp;", "&")
@@ -160,7 +161,7 @@ class MarkusShultzParser < CueFinder
     return release_no
   end
 
-  def parse_url_to_cue_file(text,asotNo)
+  def parse_url_to_cue_file(text,asotNo,part_no)
     puts "cue_url_release_pattern=#{asotNo}"
     urls=text.scan /(download.php[?]type=cue.*-#{asotNo}-.*\.cue)\"\>\<img/
     puts "scanned urls array: #{urls}"
@@ -189,12 +190,40 @@ class MagicIslandParser < CueFinder
     return release_no
   end
 
-  def parse_url_to_cue_file(text,asotNo)
+  def parse_url_to_cue_file(text,asotNo,part_no)
     urls=text.scan /(download.php[?]type=cue.*music_for_balearic_people_#{asotNo}[_-].*\.cue)\"\>\<img/
     if(urls[0] == nil )
         puts "Trying 2nd regex"
         urls=text.scan /(download.php[?]type=cue.*People_#{asotNo}[_-].*\.cue)\"\>\<img/
     end
+    puts "First found url to cue file: #{urls[0]}"
+    url=urls[0][0].gsub("&amp;", "&")
+    return url
+  end
+
+end
+
+class TiestoParser < CueFinder
+
+  def initialize(mp3Filename)
+    super(mp3Filename,"cuenation.com/","?page=cues&folder=clublife")
+  end
+
+  def parse_release_no()
+    release_no=@mp3Filename.scan /Club Life ([0-9]+) /
+    release_no=release_no[0][0]
+    puts "Club Life  release is '#{release_no}'"
+    return release_no
+  end
+  def parse_part_no()
+    part_no=@mp3Filename.scan /part ([0-9]+)/
+    part_no=part_no[0][0]
+    puts "Club Life  part_no is '#{part_no}'"
+    return part_no
+  end
+
+  def parse_url_to_cue_file(text,asotNo,part_no)
+    urls=text.scan /(download.php[?]type=cue.*filename=0#{part_no}-tiesto_-_club_life_#{asotNo}-.*\.cue)\"\>\<img/
     puts "First found url to cue file: #{urls[0]}"
     url=urls[0][0].gsub("&amp;", "&")
     return url
@@ -216,6 +245,10 @@ class CueFinderFactory
 
     if(file_name.index("Shah")!=nil) then
       return MagicIslandParser.new(file_name )
+    end
+
+   if(file_name.index("Club Life")!=nil) then
+      return TiestoParser.new(file_name )
     end
 
     return nil

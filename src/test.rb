@@ -50,7 +50,7 @@ ENDOF_URL
 ENDOF_URL
 
     cf=MarkusShultzParser.new( "" )
-    cf.parse_url_to_cue_file(html,"25-03-2010")
+    cf.parse_url_to_cue_file(html,"25-03-2010","")
 
   end
 
@@ -79,7 +79,7 @@ def test_MagicIsland_parse_cue_url
     <a href="download.php?type=cue&amp;folder=magicisland&amp;filename=01-roger_shah_magic_island_-_music_for_balearic_people_098_%28di.fm%29_26-03-2010-tt.cue"><img src="layout/download.png" alt="Download!" /></a> <a href="?page=tracklist&amp;folder=magicisland&amp;filename=01-roger_shah_magic_island_-_music_for_balearic_people_098_%28di.fm%29_26-03-2010-tt.cue"> Magic Island - Music for Balearic People 098 (2010-03-26) [TT]</a><br />
 ENDOF_URL
 
-    url=cf.parse_url_to_cue_file(html,"098")
+    url=cf.parse_url_to_cue_file(html,"098","")
     
     assert_equal("download.php?type=cue&folder=magicisland&filename=01-roger_shah_magic_island_-_music_for_balearic_people_098_%28di.fm%29_26-03-2010-tt.cue", url)
   end
@@ -92,9 +92,18 @@ def test_MagicIsland_parse_cue_url2
     <a href="download.php?type=cue&folder=magicisland&filename=01-DJ_Shah_-_Magic_Island_-_Music_for_Balearic_People_99-NET-2010-04-02-iRUSH.cue"><img src="layout/download.png" alt="Download!" /></a> <a href="?page=tracklist&folder=magicisland&filename=01-DJ_Shah_-_Magic_Island_-_Music_for_Balearic_People_99-NET-2010-04-02-iRUSH.cue"> Magic Island - Music for Balearic People 099 (2010-04-02) [iRUSH]</a><br /> 
 ENDOF_URL
 
-    url=cf.parse_url_to_cue_file(html,"99")
+    url=cf.parse_url_to_cue_file(html,"99","")
     
     assert_equal("download.php?type=cue&folder=magicisland&filename=01-DJ_Shah_-_Magic_Island_-_Music_for_Balearic_People_99-NET-2010-04-02-iRUSH.cue", url)
   end
+
+def test_Tiesto_release
+    file_name="01. Tiesto - Club Life 156 (2010-03-26) part 1.mp3"
+    cf=TiestoParser.new( file_name )
+    rel_no=cf.parse_release_no()
+    assert_equal("156",rel_no )
+    part_no=cf.parse_part_no()
+    assert_equal("1",part_no )
+end
 
 end
