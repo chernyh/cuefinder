@@ -9,10 +9,8 @@ require 'etc'
 
 class CueFinder
 
-  def initialize(mp3Filename, start_page,radioshow_folder_path)
+  def initialize(mp3Filename)
     @mp3Filename=mp3Filename
-    @start_page=start_page
-    @radioshow_folder_path=radioshow_folder_path
     @release_no=parse_release_no()
     @part_no=parse_part_no()
     p = Pathname.new(mp3Filename)
@@ -54,15 +52,22 @@ class CueFinder
 
   def get(url)
     puts "downloading url: #{url}"
-    browser=Net::HTTP::Proxy(@proxy_host , @proxy_port).start(@start_page)
+    browser=Net::HTTP::Proxy(@proxy_host , @proxy_port).start("cuenation.com/")
     res=browser.get(url, {"Referer" => "http://cuenation.com/?page=cues&folder=gdjb"})
     return res.body
   end
 
+  def find_url_to_cue_file(html)
+    cue_url=parse_url_to_cue_file(html,@release_no,@part_no)[0][0]
+    #urls are returned with &amp; , like a=1&amp;b=2&amp;c=3
+    cue_url=cue_url.gsub("&amp;", "&")
+    return cue_url
+  end
+
   def download_cue()
     if(@release_no!=nil) then
-      html=get(@radioshow_folder_path)
-      cue_url=parse_url_to_cue_file(html,@release_no,@part_no)
+      html=get(get_radioshow_folder_path())
+      cue_url=find_url_to_cue_file()
       puts "cueUrl is #{cue_url}, downloading"
       content=get(cue_url)
       f=File.new(@cue_file_name,"w")
@@ -119,8 +124,8 @@ end
 
 class ASOTParser < CueFinder
   
-  def initialize(mp3Filename)
-    super(mp3Filename,"cuenation.com/","?page=cues&folder=asot")
+  def get_radioshow_folder_path
+    return "?page=cues&folder=asot"
   end
 
   def parse_release_no()
@@ -138,9 +143,7 @@ class ASOTParser < CueFinder
 
   def parse_url_to_cue_file(text,asotNo,part_no)
     urls=text.scan /(download.php[?]type=cue.*#{asotNo}.*\.cue)\"\>\<img/
-    puts "First found url to cue file: #{urls[0]}"
-    url=urls[0][0].gsub("&amp;", "&")
-    return url
+    return urls
   end
 
 end
@@ -148,8 +151,9 @@ end
 
 
 class MarkusShultzParser < CueFinder
-  def initialize(mp3Filename)
-    super(mp3Filename,"cuenation.com/","?page=cues&folder=gdjb")
+
+  def get_radioshow_folder_path
+    return "?page=cues&folder=gdjb"
   end
 
   def parse_release_no()
@@ -182,20 +186,15 @@ class MarkusShultzParser < CueFinder
   end
 
   def parse_url_to_cue_file(text,asotNo,part_no)
-    puts "cue_url_release_pattern=#{asotNo}"
-    urls=text.scan /(download.php[?]type=cue.*-#{asotNo}-.*\.cue)\"\>\<img/
-    puts "scanned urls array: #{urls}"
-    url=urls[0][0].gsub("&amp;", "&")
-    puts "scanned url: #{url}"
-    return url
+    return text.scan /(download.php[?]type=cue.*-#{asotNo}-.*\.cue)\"\>\<img/
   end
 
 end
 
 class MagicIslandParser < CueFinder
 
-  def initialize(mp3Filename)
-    super(mp3Filename,"cuenation.com/","?page=cues&folder=magicisland")
+  def get_radioshow_folder_path
+    return "?page=cues&folder=magicisland"
   end
 
   def parse_release_no()
@@ -216,17 +215,15 @@ class MagicIslandParser < CueFinder
       puts "Trying 2nd regex"
       urls=text.scan /(download.php[?]type=cue.*People_#{asotNo}[_-].*\.cue)\"\>\<img/
     end
-    puts "First found url to cue file: #{urls[0]}"
-    url=urls[0][0].gsub("&amp;", "&")
-    return url
+    return urls
   end
 
 end
 
 class TiestoParser < CueFinder
 
-  def initialize(mp3Filename)
-    super(mp3Filename,"cuenation.com/","?page=cues&folder=clublife")
+  def get_radioshow_folder_path
+    return "?page=cues&folder=clublife"
   end
 
   def parse_release_no()
@@ -243,10 +240,7 @@ class TiestoParser < CueFinder
   end
 
   def parse_url_to_cue_file(text,asotNo,part_no)
-    urls=text.scan /(download.php[?]type=cue.*filename=0#{part_no}-tiesto_-_club_life_#{asotNo}-.*\.cue)\"\>\<img/
-    puts "First found url to cue file: #{urls[0]}"
-    url=urls[0][0].gsub("&amp;", "&")
-    return url
+    return text.scan /(download.php[?]type=cue.*filename=0#{part_no}-tiesto_-_club_life_#{asotNo}-.*\.cue)\"\>\<img/
   end
 
 end
