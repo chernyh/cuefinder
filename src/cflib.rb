@@ -13,6 +13,8 @@ class CueFinder
     @mp3Filename=mp3Filename
     @start_page=start_page
     @radioshow_folder_path=radioshow_folder_path
+    @release_no=parse_release_no()
+    @part_no=parse_part_no()
     p = Pathname.new(mp3Filename)
     basename = "#{p.basename(".mp3")}"
     @cue_file_name="#{basename}.cue"
@@ -26,6 +28,10 @@ class CueFinder
     @proxy_port =props["proxy_port"];
     puts "using proxy: #{@proxy_host}:#{@proxy_port}"
 
+  end
+  
+  def parse_part_no()
+    return nil
   end
 
   def load_properties(properties_filename)
@@ -54,11 +60,9 @@ class CueFinder
   end
 
   def download_cue()
-    release_no=parse_release_no()
-    part_no=parse_part_no()
-    if(release_no!=nil) then
+    if(@release_no!=nil) then
       html=get(@radioshow_folder_path)
-      cue_url=parse_url_to_cue_file(html,release_no,part_no)
+      cue_url=parse_url_to_cue_file(html,@release_no,@part_no)
       puts "cueUrl is #{cue_url}, downloading"
       content=get(cue_url)
       f=File.new(@cue_file_name,"w")
@@ -73,9 +77,25 @@ class CueFinder
     end
   end
 
+  #when radioshow is plit into 2 parts,we need to distinguish them by prefix
+  #i.e.:
+  # 101 Tiesto - Track1.mp3
+  # 102 Tiesto - Track2.mp3
+  #... second part begins:
+  # 201 Tiesto - Track1.mp3
+  # 202 Tiesto - Track2.mp3
+  def make_output_format()
+    output_format="@n+@p+@t"
+    if(@part_no!=nil)
+      output_format="#{@part_no}"+output_format
+    end
+    return output_format
+  end
+
   def call_mp3splt(cue_file_name,mp3_file_name)
     p=Pathname.new( mp3_file_name)
-    cmd = "mp3splt -c \"#{cue_file_name}\" -d \"#{p.dirname}\" \"#{mp3_file_name}\""
+    output_format=make_output_format()
+    cmd = "mp3splt -o #{output_format} -c \"#{cue_file_name}\" -d \"#{p.dirname}\" \"#{mp3_file_name}\""
     puts cmd
     ret=system(cmd)
     if (!ret) then
@@ -146,15 +166,15 @@ class MarkusShultzParser < CueFinder
       release_no=@mp3Filename.scan /Tour_(.*_.*_.*)\.mp3/
     end
 
-      #extract from array
-      release_no=release_no[0][0]
-      release_no=release_no.gsub("_", " ")
-      #25 March 2010
-      d,m,y=release_no.split(" ")
-      #March -> "03"
-      m_number=Date::MONTHNAMES.index(m).to_s.rjust(2,"0")
-      d=d.rjust(2,"0")
-      release_no="#{d}-#{m_number}-#{y}"
+    #extract from array
+    release_no=release_no[0][0]
+    release_no=release_no.gsub("_", " ")
+    #25 March 2010
+    d,m,y=release_no.split(" ")
+    #March -> "03"
+    m_number=Date::MONTHNAMES.index(m).to_s.rjust(2,"0")
+    d=d.rjust(2,"0")
+    release_no="#{d}-#{m_number}-#{y}"
 
 
     puts "Global DJ Broadcast release is '#{release_no}'"
@@ -193,8 +213,8 @@ class MagicIslandParser < CueFinder
   def parse_url_to_cue_file(text,asotNo,part_no)
     urls=text.scan /(download.php[?]type=cue.*music_for_balearic_people_#{asotNo}[_-].*\.cue)\"\>\<img/
     if(urls[0] == nil )
-        puts "Trying 2nd regex"
-        urls=text.scan /(download.php[?]type=cue.*People_#{asotNo}[_-].*\.cue)\"\>\<img/
+      puts "Trying 2nd regex"
+      urls=text.scan /(download.php[?]type=cue.*People_#{asotNo}[_-].*\.cue)\"\>\<img/
     end
     puts "First found url to cue file: #{urls[0]}"
     url=urls[0][0].gsub("&amp;", "&")
@@ -247,7 +267,7 @@ class CueFinderFactory
       return MagicIslandParser.new(file_name )
     end
 
-   if(file_name.index("Club Life")!=nil) then
+    if(file_name.index("Club Life")!=nil) then
       return TiestoParser.new(file_name )
     end
 
