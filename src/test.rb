@@ -64,6 +64,10 @@ ENDOF_URL
 
     file_name = "Roger Shah presents Magic Island - Music for Balearic People Episode 098.mp3"
     assert_instance_of(MagicIslandParser, CueFinderFactory.make_cuefinder(file_name))
+
+    file_name="Paul van Dyk - Vonyc Sessions 188 (2010-04-01) (including Lange Guestmix) [TALiON].mp3"
+    assert_instance_of(VonycParser, CueFinderFactory.make_cuefinder(file_name))
+    
   end
 
   def test_MagicIsland_parse_release_no
@@ -73,7 +77,7 @@ ENDOF_URL
     assert_equal("098", rel_no)
   end
   
-def test_MagicIsland_parse_cue_url
+  def test_MagicIsland_parse_cue_url
     file_name = "Roger Shah presents Magic Island - Music for Balearic People Episode 098.mp3"
     cf=MagicIslandParser.new( file_name )
     html =<<ENDOF_URL
@@ -86,7 +90,7 @@ ENDOF_URL
   end
 
 
-def test_MagicIsland_parse_cue_url2
+  def test_MagicIsland_parse_cue_url2
 
     file_name = "Roger Shah presents Magic Island - Music for Balearic People Episode 99.mp3"
     cf=MagicIslandParser.new( file_name )
@@ -100,13 +104,38 @@ ENDOF_URL
     assert_equal("download.php?type=cue&folder=magicisland&filename=01-DJ_Shah_-_Magic_Island_-_Music_for_Balearic_People_99-NET-2010-04-02-iRUSH.cue", url)
   end
 
-def test_Tiesto_release
+  def test_Tiesto_release
     file_name="01. Tiesto - Club Life 156 (2010-03-26) part 1.mp3"
     cf=TiestoParser.new( file_name )
     rel_no=cf.parse_release_no()
     assert_equal("156",rel_no )
     part_no=cf.parse_part_no()
     assert_equal("1",part_no )
-end
+  end
+
+
+  def test_VonycReleaseNo
+    file_name="Paul van Dyk - Vonyc Sessions 188 (2010-04-01) (including Lange Guestmix) [TALiON].mp3"
+    cf=VonycParser.new( file_name )
+    rel_no=cf.parse_release_no()
+    assert_equal("188",rel_no )
+  end
+
+
+  def test_vonyc_parse_cue_url
+    file_name="Paul van Dyk - Vonyc Sessions 188 (2010-04-01) (including Lange Guestmix) [TALiON].mp3"
+    cf=VonycParser.new( file_name )
+
+    html =<<ENDOF_URL
+    <p class="list">
+<a href="download.php?type=cue&amp;folder=vonyc&amp;filename=01-paul_van_dyk_-_vonyc_sessions_188-sat-04-01-2010-talion.cue"><img
+ENDOF_URL
+
+    url=cf.find_url_to_cue_file(html)
+
+    assert_equal("download.php?type=cue&folder=vonyc&filename=01-paul_van_dyk_-_vonyc_sessions_188-sat-04-01-2010-talion.cue", url)
+  end
+
+
 
 end

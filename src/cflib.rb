@@ -249,6 +249,25 @@ class TiestoParser < CueFinder
 
 end
 
+class VonycParser < CueFinder
+
+  def get_radioshow_folder_path
+    return "?page=cues&folder=vonyc"
+  end
+
+  def parse_release_no()
+    release_no=@mp3Filename.scan /Vonyc Sessions ([0-9]+) /
+    release_no=release_no[0][0]
+    puts "Vonyc Sessions release is '#{release_no}'"
+    return release_no
+  end
+
+  def parse_url_to_cue_file(text,asotNo,part_no)
+    return text.scan /(download.php[?]type=cue.*vonyc_sessions_#{@release_no}-.*\.cue)\"\>\<img/
+  end
+
+end
+
 
 class CueFinderFactory
 
@@ -267,6 +286,10 @@ class CueFinderFactory
 
     if(file_name.index("Club Life")!=nil) then
       return TiestoParser.new(file_name )
+    end
+
+    if(file_name.index("Vonyc")!=nil) then
+      return VonycParser.new(file_name )
     end
 
     return nil
