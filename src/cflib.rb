@@ -67,7 +67,7 @@ class CueFinder
   def download_cue()
     if(@release_no!=nil) then
       html=get(get_radioshow_folder_path())
-      cue_url=find_url_to_cue_file()
+      cue_url=find_url_to_cue_file(html)
       puts "cueUrl is #{cue_url}, downloading"
       content=get(cue_url)
       f=File.new(@cue_file_name,"w")
@@ -106,7 +106,11 @@ class CueFinder
     if (!ret) then
       puts "could not split mp3 file: #{mp3_file_name}"
     else
-      File.delete(mp3_file_name)
+        if(@part_no==nil) then
+            File.delete(mp3_file_name)
+        else
+            puts "mp3 file not deleted (radioshows containing more than 1 part not yet well tested)"
+        end
       File.delete(cue_file_name)
     end
   end
