@@ -107,11 +107,11 @@ class CueFinder
       puts "could not split mp3 file: #{mp3_file_name}"
     else
         if(@part_no==nil) then
-            File.delete(mp3_file_name)
+            #File.delete(mp3_file_name)
         else
             puts "mp3 file not deleted (radioshows containing more than 1 part not yet well tested)"
         end
-      File.delete(cue_file_name)
+      #File.delete(cue_file_name)
     end
   end
 
@@ -256,7 +256,7 @@ class VonycParser < CueFinder
   end
 
   def parse_release_no()
-    release_no=@mp3Filename.scan /Vonyc Sessions ([0-9]+) /
+    release_no=@mp3Filename.scan /sessions_([0-9]+)-/
     release_no=release_no[0][0]
     puts "Vonyc Sessions release is '#{release_no}'"
     return release_no
@@ -288,8 +288,8 @@ class CueFinderFactory
       return TiestoParser.new(file_name )
     end
 
-    if(file_name.index("Vonyc")!=nil) then
-      return VonycParser.new(file_name )
+    if(file_name.index("Vonyc")!=nil || file_name.index("vonyc")!=nil ) then
+      return VonycParser.new( file_name )
     end
 
     return nil

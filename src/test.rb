@@ -65,7 +65,7 @@ ENDOF_URL
     file_name = "Roger Shah presents Magic Island - Music for Balearic People Episode 098.mp3"
     assert_instance_of(MagicIslandParser, CueFinderFactory.make_cuefinder(file_name))
 
-    file_name="Paul van Dyk - Vonyc Sessions 188 (2010-04-01) (including Lange Guestmix) [TALiON].mp3"
+    file_name="01-paul_van_dyk_-_vonyc_sessions_188-sat-04-01-2010-talion.mp3"
     assert_instance_of(VonycParser, CueFinderFactory.make_cuefinder(file_name))
     
   end
@@ -115,15 +115,15 @@ ENDOF_URL
 
 
   def test_VonycReleaseNo
-    file_name="Paul van Dyk - Vonyc Sessions 188 (2010-04-01) (including Lange Guestmix) [TALiON].mp3"
+    file_name="01-paul_van_dyk_-_vonyc_sessions_189-sat-04-08-2010-talion.mp3"
     cf=VonycParser.new( file_name )
     rel_no=cf.parse_release_no()
-    assert_equal("188",rel_no )
+    assert_equal("189",rel_no )
   end
 
 
   def test_vonyc_parse_cue_url
-    file_name="Paul van Dyk - Vonyc Sessions 188 (2010-04-01) (including Lange Guestmix) [TALiON].mp3"
+    file_name="01-paul_van_dyk_-_vonyc_sessions_188-sat-04-01-2010-talion.mp3"
     cf=VonycParser.new( file_name )
 
     html =<<ENDOF_URL
