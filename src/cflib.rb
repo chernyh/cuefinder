@@ -24,7 +24,8 @@ class CueFinder
     props = load_properties(path_to_config)
     @proxy_host =props["proxy_host"];
     @proxy_port =props["proxy_port"];
-    puts "using proxy: #{@proxy_host}:#{@proxy_port}"
+    @proxy_set=props["proxy_set"]; 
+    puts "using proxy: #{@proxy_host}:#{@proxy_port} , set: #{@proxy_set}"
 
   end
   
@@ -52,13 +53,21 @@ class CueFinder
 
   def get(url)
     puts "downloading url: #{url}"
-    browser=Net::HTTP::Proxy(@proxy_host , @proxy_port).start("cuenation.com/")
+    if(@proxy_set == nil || @proxy_set !="off"  )
+      browser=Net::HTTP::Proxy(@proxy_host , @proxy_port).start("cuenation.com/")
+    else
+       puts "working without proxy"
+       browser=Net::HTTP.start("cuenation.com/")
+    end
+
     res=browser.get(url, {"Referer" => "http://cuenation.com/?page=cues&folder=gdjb"})
     return res.body
   end
 
   def find_url_to_cue_file(html)
-    cue_url=parse_url_to_cue_file(html,@release_no,@part_no)[0][0]
+    cue_url=parse_url_to_cue_file(html,@release_no,@part_no)
+    raise "Sorry , can't find url for release #{@release_no}" if cue_url[0].nil?
+    cue_url=cue_url[0][0]
     #urls are returned with &amp; , like a=1&amp;b=2&amp;c=3
     cue_url=cue_url.gsub("&amp;", "&")
     return cue_url
@@ -107,11 +116,11 @@ class CueFinder
       puts "could not split mp3 file: #{mp3_file_name}"
     else
         if(@part_no==nil) then
-            #File.delete(mp3_file_name)
+            File.delete(mp3_file_name)
         else
             puts "mp3 file not deleted (radioshows containing more than 1 part not yet well tested)"
         end
-      #File.delete(cue_file_name)
+      File.delete(cue_file_name)
     end
   end
 
