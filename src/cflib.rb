@@ -118,7 +118,8 @@ class CueFinder
         if(@part_no==nil) then
             File.delete(mp3_file_name)
         else
-            puts "mp3 file not deleted (radioshows containing more than 1 part not yet well tested)"
+            #puts "mp3 file not deleted (radioshows containing more than 1 part not yet well tested)"
+            File.delete(mp3_file_name)
         end
       File.delete(cue_file_name)
     end
