@@ -125,10 +125,22 @@ class CueFinder
     end
   end
 
+    #convert filenames to UTF-8 , f.e. Tiesto mp3's has specific symbols
+    def call_convmv(mp3_file_name)
+        p=Pathname.new( mp3_file_name)
+        cmd = "convmv -f ISO_8859-16 -t UTF-8 \"#{p.dirname}\"/*.mp3 --notest"
+        puts "converting filenames to UTF-8: #{cmd}"
+        ret=system(cmd)
+        if (!ret) then
+           puts "could not convert filenames"
+        end
+    end
+
   def process
     cue_file=download_cue()
     if cue_file!=nil then
       call_mp3splt(@cue_file_name,@mp3Filename)
+      call_convmv(@mp3Filename)
     else
       puts "could not find cue sheet for: #{@mp3Filename}"
     end
