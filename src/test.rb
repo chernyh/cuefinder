@@ -41,7 +41,15 @@ ENDOF_URL
     puts "releaseNo='#{rel_no}'"
     assert_equal("01-04-2010",rel_no )   
   end
+  
+  def test_ParseGDJBRelease4
+    file_name = "Global DJ Broadcast (2010-05-27) (Do You Dream? Album Release Special) [TMB] (SBD).mp3"
+    cf=MarkusShultzParser.new( file_name  )
+    rel_no=cf.parse_release_no()
+    assert_equal("27-05-2010",rel_no )   
+  end
 
+  
 
   def test_CueUrlFromHtmlPage
     html= <<ENDOF_URL
@@ -54,6 +62,17 @@ ENDOF_URL
     cf.parse_url_to_cue_file(html,"25-03-2010","")
 
   end
+ 
+   def test_CueUrlFromHtmlPage2
+    html= <<ENDOF_URL
+<a href="download.php?type=cue&amp;folder=gdjb&amp;filename=markus_schulz_-_global_dj_broadcast_-_2010-05-27_-_do_you_dream_release_special.cue"><img src="layout/download.png" alt="Download!" /></a> <a href="?page=tracklist&amp;folder=gdjb&amp;filename=markus_schulz_-_global_dj_broadcast_-_2010-05-27_-_do_you_dream_release_special.cue"> Global DJ Broadcast (2010-05-27) (Do You Dream? Album Release Special) [TMB] (SBD)</a><br /> 
+ENDOF_URL
+
+    file_name = "Global DJ Broadcast (2010-05-27) (Do You Dream? Album Release Special) [TMB] (SBD).mp3"
+    cf=MarkusShultzParser.new( file_name  )
+    cf.parse_url_to_cue_file(html,"27-05-2010","")
+  end
+ 
 
   def test_CueFinderFactory
     file_name = "Markus Schulz presents - Global DJ Broadcast WMC Special (25 March 2010).mp3"

@@ -183,7 +183,7 @@ class MarkusShultzParser < CueFinder
   end
 
   def parse_release_no()
-    release_no=@mp3Filename.scan /Global DJ Broadcast \((.*)\).*\.mp3/
+    release_no=@mp3Filename.scan /Global DJ Broadcast \((.*?)\).*\.mp3/
 
     if(release_no[0] == nil) then 
       #another pattern
@@ -198,12 +198,27 @@ class MarkusShultzParser < CueFinder
 
     #extract from array
     release_no=release_no[0][0]
+    puts "release_no before processing #{release_no}"
+    puts "release_no as arr #{release_no[0]}"
     release_no=release_no.gsub("_", " ")
+    release_no=release_no.gsub("-", " ")
+    
     #25 March 2010
     d,m,y=release_no.split(" ")
+    puts "d,m,y #{d} , #{m}, #{y}"
     #March -> "03"
     m_number=Date::MONTHNAMES.index(m).to_s.rjust(2,"0")
-    d=d.rjust(2,"0")
+    #not March but 05
+    if(m_number == "00") then
+      m_number = m
+    else
+      d=d.rjust(2,"0")
+    end
+
+    #2010-05-27 -> 27-05-2010
+    if(d.length==4) then
+      d,y=y,d
+    end
     release_no="#{d}-#{m_number}-#{y}"
 
 
