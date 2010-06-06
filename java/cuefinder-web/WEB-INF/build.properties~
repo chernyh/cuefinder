@@ -1,0 +1,3 @@
+appserver.home=/usr/share/tomcat5.5
+appserver.lib=${appserver.home}/common/lib
+
