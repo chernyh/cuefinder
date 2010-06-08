@@ -1,7 +1,15 @@
 package ru.cuefinder;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.io.StringWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,14 +56,17 @@ public abstract class CueFinder
     }
 
 
-    protected String get( String url )
+    protected String get( String url ) throws IOException
     {
         System.out.println( "downloading url: " + url );
+        HttpClient hc = new DefaultHttpClient();
+        HttpGet get = new HttpGet( url );
+        get.addHeader( "Referer", "http://cuenation.com/?page=cues&folder=gdjb" );
+        HttpResponse resp = hc.execute( get );
 
-        //todo
-//    res=browser.get(url, {"Referer" => "http://cuenation.com/?page=cues&folder=gdjb"})
-//    return res.body
-        return null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        resp.getEntity().writeTo( baos );
+        return new String( baos.toByteArray() );
     }
 
     public String find_url_to_cue_file( String html ) throws Exception
