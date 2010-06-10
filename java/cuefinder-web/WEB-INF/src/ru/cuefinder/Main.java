@@ -11,13 +11,14 @@ public class Main
 {
     public static void main( String[] args ) throws Exception
     {
-        if( args.length == 0 )
-        {
-            System.out.println( "Please provide file name" );
-            return;
-        }
+//        if( args.length == 0 )
+//        {
+//            System.out.println( "Please provide file name" );
+//            return;
+//        }
 
-        String fName = args[0];
+//        String fName = args[0];
+        String fName = "/home/chernyh/tmp/armin/Armin van Buuren presents - A State of Trance Episode 455.mp3";
         CueFinder cf = CueFinderFactory.makeCueFinder( fName );
         if( cf == null )
         {

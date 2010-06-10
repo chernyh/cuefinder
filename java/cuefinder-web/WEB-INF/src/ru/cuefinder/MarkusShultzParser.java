@@ -4,8 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MarkusShultzParser extends CueFinder
 {
@@ -34,12 +32,12 @@ public class MarkusShultzParser extends CueFinder
         {
             return release_no;
         }
-        System.out.println( "trying 2nd pattern" );
+        log.add( "trying 2nd pattern" );
 
         release_no = getFirstMatch( "\\((.*)\\)\\.mp3", mp3Filename );
         if( release_no == null )
         {
-            System.out.println( "trying 3rd pattern" );
+            log.add( "trying 3rd pattern" );
             release_no = getFirstMatch( "Tour_(.*_.*_.*)\\.mp3", mp3Filename );
         }
 

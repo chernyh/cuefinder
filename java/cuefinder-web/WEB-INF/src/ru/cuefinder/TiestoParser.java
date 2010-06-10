@@ -1,8 +1,5 @@
 package ru.cuefinder;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Created by IntelliJ IDEA.
  * User: chernyh
@@ -33,7 +30,7 @@ public class TiestoParser extends CueFinder
     public String parse_release_no() throws Exception
     {
         release_no = getFirstMatch( "Club Life ([0-9]+) ", mp3Filename );
-        System.out.println( "Tiesto release is '" + release_no + "'" );
+        log.add( "Tiesto release is '" + release_no + "'" );
         return release_no;
 
     }

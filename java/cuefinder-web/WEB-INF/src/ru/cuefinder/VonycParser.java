@@ -30,7 +30,7 @@ public class VonycParser extends CueFinder
     public String parse_release_no() throws Exception
     {
         release_no = getFirstMatch( "sessions_([0-9]+)-", mp3Filename );
-        System.out.println( "Vonic release is '" + release_no + "'" );
+        log.add( "Vonic release is '" + release_no + "'" );
         return release_no;
 
     }

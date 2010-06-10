@@ -1,9 +1,5 @@
 package ru.cuefinder;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class MagicIslandParser extends CueFinder
 {
     public MagicIslandParser( String mp3Filename )
@@ -25,10 +21,10 @@ public class MagicIslandParser extends CueFinder
         {
             return match;
         }
-        System.out.println( "trying 2nd pattern" );
+        log.add( "trying 2nd pattern" );
 
         match = getFirstMatch( "_([0-9]+)-", mp3Filename );
-        System.out.println( "Magic Island release is '" + match + "'" );
+        log.add( "Magic Island release is '" + match + "'" );
         return match;
 
     }
@@ -41,7 +37,7 @@ public class MagicIslandParser extends CueFinder
         {
             return release_no;
         }
-        System.out.println( "trying 2nd pattern" );
+        log.add( "trying 2nd pattern" );
         release_no = getFirstMatch( "(download.php[?]type=cue.*People_" + asotNo + "[_-].*\\.cue)\\\"\\>\\<img", html );
         return release_no;
     }

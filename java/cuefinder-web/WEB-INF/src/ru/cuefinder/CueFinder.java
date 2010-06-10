@@ -5,20 +5,26 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.StringWriter;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class CueFinder
 {
+    private static final String CUENATION_URL_PREFIX = "http://cuenation.com/";
     String mp3Filename;
     String release_no;
     int part_no;
     String cue_file_name;
+
+    List<String> log = new ArrayList<String>();
 
     public CueFinder( String mp3Filename )
     {
@@ -58,7 +64,7 @@ public abstract class CueFinder
 
     protected String get( String url ) throws IOException
     {
-        System.out.println( "downloading url: " + url );
+        log.add( "downloading url: " + url );
         HttpClient hc = new DefaultHttpClient();
         HttpGet get = new HttpGet( url );
         get.addHeader( "Referer", "http://cuenation.com/?page=cues&folder=gdjb" );
@@ -73,11 +79,13 @@ public abstract class CueFinder
     {
         String cue_url = parse_url_to_cue_file( html, release_no, part_no );
         if( cue_url == null )
-            throw new Exception( "Sorry , can't find url for release #{@release_no}" );
+        {
+            String message = "Sorry , can't find url for release " + release_no;
+            System.out.println( message );
+            System.out.println( html );
+            throw new Exception( message );
+        }
 
-//    cue_url=cue_url[0][0]
-//    #urls are returned with &amp; , like a=1&amp;b=2&amp;c=3
-//    cue_url=cue_url.gsub("&amp;", "&")
         return cue_url;
     }
 
@@ -87,21 +95,21 @@ public abstract class CueFinder
     {
         if( release_no != null )
         {
-            String html = get( get_radioshow_folder_path() );
-            String cue_url = find_url_to_cue_file( html );
-            System.out.println( "cueUrl is #{cue_url}, downloading" );
+            String html = get( CUENATION_URL_PREFIX + get_radioshow_folder_path() );
+            String cue_url = CUENATION_URL_PREFIX + find_url_to_cue_file( html );
+            log.add( "cueUrl is " + cue_url + ", downloading" );
             String content = get( cue_url );
             File f = new File( cue_file_name );
-            //todo
-//          f.write( content )
-//          f.close
-            System.out.println( "cue file saved to #{@cue_file_name}" );
-//          #puts
-//          "#{content}#"
+
+            System.out.println( "Cue file:\n" + content );
+            FileOutputStream fos = new FileOutputStream( f );
+            fos.write( content.getBytes() );
+            fos.close();
+            log.add( "cue file saved to " + cue_file_name );
             return cue_file_name;
         } else
         {
-            System.out.println( "release no could not be parsed, sorry" );
+            log.add( "release no could not be parsed, sorry" );
             return null;
         }
     }
@@ -121,34 +129,65 @@ public abstract class CueFinder
     {
         String output_format = "@n+@p+@t";
         if( part_no != 0 )
-            output_format = "#{@part_no}" + output_format;
+            output_format = part_no + output_format;
 
         return output_format;
+    }
+
+    int executeCommand( File dir, String... args ) throws IOException, InterruptedException
+    {
+
+        Process proc = Runtime.getRuntime().exec( args, null, dir );
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader( proc.getInputStream() ) );
+        String line = null;
+        while( ( line = in.readLine() ) != null )
+        {
+            System.out.println( line );
+        }
+
+        BufferedReader ein = new BufferedReader(
+                new InputStreamReader( proc.getErrorStream() ) );
+        line = null;
+        while( ( line = ein.readLine() ) != null )
+        {
+            System.out.println( line );
+        }
+
+        proc.waitFor();
+        return proc.exitValue();
     }
 
     void call_mp3splt( String cue_file_name, String mp3_file_name ) throws IOException, InterruptedException
     {
         File mp3File = new File( mp3_file_name );
-        String dirName = mp3File.getParentFile().getAbsolutePath();
+        File cueFile = new File( cue_file_name );
         String output_format = make_output_format();
-        String cmd = "mp3splt -o #{output_format} -c \"#{cue_file_name}\" -d \"" + dirName + "\" \"#{mp3_file_name}\"";
-        System.out.println( cmd );
-        Process proc = Runtime.getRuntime().exec( cmd );
-        proc.waitFor();
+        String cmd = "mp3splt -o " + output_format + " -c \"" + cue_file_name + "\"  \"" + mp3_file_name + "\"";
+        log.add( cmd );
 
-        if( proc.exitValue() != 0 )
+        if( executeCommand( mp3File.getParentFile(),
+                "mp3splt",
+                "-Q",// hangs up without it
+                "-o",
+                output_format,
+                "-c",
+                cueFile.getName(),
+                mp3File.getName()
+        ) != 0 )
         {
-            System.out.println( "could not split mp3 file: #{mp3_file_name}" );
+            log.add( "could not split mp3 file: " + mp3_file_name );
         } else
         {
             if( part_no == 0 )
             {
-                mp3File.delete();
+//                mp3File.delete();
             } else
-//            System.out.println("mp3 file not deleted (radioshows containing more than 1 part not yet well tested)");
-                mp3File.delete();
+//            log.add("mp3 file not deleted (radioshows containing more than 1 part not yet well tested)");
+//                mp3File.delete();
 
-            new File( cue_file_name ).delete();
+                new File( cue_file_name ).delete();
         }
     }
 
@@ -159,16 +198,16 @@ public abstract class CueFinder
     {
         String dir = new File( mp3_file_name ).getParentFile().getAbsolutePath();
         String cmd = "convmv -f ISO_8859-16 -t UTF-8 \"" + dir + "\"/*.mp3 --notest";
-        System.out.println( "converting filenames to UTF-8: #{cmd}" );
+        log.add( "converting filenames to UTF-8: " + cmd );
         Process proc = Runtime.getRuntime().exec( cmd );
         proc.waitFor();
         if( proc.exitValue() != 0 )
         {
-            System.out.println( "could not convert filenames" );
+            log.add( "could not convert filenames" );
         }
     }
 
-    void process() throws Exception, InterruptedException
+    public void process() throws Exception, InterruptedException
     {
         String cue_file = download_cue();
         if( cue_file != null )
@@ -177,7 +216,7 @@ public abstract class CueFinder
             call_convmv( mp3Filename );
         } else
         {
-            System.out.println( "could not find cue sheet for: #{@mp3Filename}" );
+            log.add( "could not find cue sheet for: " + mp3Filename );
         }
     }
 
@@ -187,11 +226,20 @@ public abstract class CueFinder
         Matcher m = p.matcher( input );
         if( m.find() )
         {
-            return m.group( 1 );
+            return m.group( 1 ).replaceAll( "&amp;", "&" );
         } else
             return null;
 
     }
 
+    public String getMp3Filename()
+    {
+        return mp3Filename;
+    }
+
+    public String getOutput()
+    {
+        return log.toString();
+    }
 
 }

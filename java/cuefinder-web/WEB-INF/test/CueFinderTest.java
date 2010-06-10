@@ -146,4 +146,17 @@ public class CueFinderTest extends TestCase
     }
 
 
+     public void test_ASOT_parse_cue_url() throws Exception
+    {
+        String file_name = "Armin van Buuren presents - A State of Trance Episode 455.mp3";
+        ASOTParser cf = new ASOTParser( file_name );
+        String html = "<a href=\"download.php?type=cue&amp;folder=asot&amp;filename=01-Armin_van_Buuren_-_A_State_of_Trance_456-NET-2010-05-13-iRUSH.cue\"><img src=\"layout/download.png\" alt=\"Download!\" /></a> <a href=\"?page=tracklist&amp;folder=asot&amp;filename=01-Armin_van_Buuren_-_A_State_of_Trance_456-NET-2010-05-13-iRUSH.cue\"> A State of Trance Episode 456 (2010-05-13) [iRUSH]</a><br />\n" +
+                "<a href=\"download.php?type=cue&amp;folder=asot&amp;filename=01-armin_van_buuren_-_a_state_of_trance_455_%28di.fm%29_06-05-2010-tt.cue\"><img src=\"layout/download.png\" alt=\"Download!\" /></a> <a href=\"?page=tracklist&amp;folder=asot&amp;filename=01-armin_van_buuren_-_a_state_of_trance_455_%28di.fm%29_06-05-2010-tt.cue\"> A State of Trance Episode 455 (2010-05-06) [TT]</a><br />\n" +
+                "<a href=\"download.php?type=cue&amp;folder=asot&amp;filename=01-armin_van_buuren_-_a_state_of_trance_episode_455-%28di.fm%29-06-05-2010-ps.cue\"><img src=\"layout/download.png\" alt=\"Download!\" /></a> <a href=\"?page=tracklist&amp;folder=asot&amp;filename=01-armin_van_buuren_-_a_state_of_trance_episode_455-%28di.fm%29-06-05-2010-ps.cue\"> A State of Trance Episode 455 (2010-05-06) [PS]</a><br />";
+        String url = cf.find_url_to_cue_file( html );
+        assertEquals( "download.php?type=cue&folder=asot&filename=01-armin_van_buuren_-_a_state_of_trance_455_%28di.fm%29_06-05-2010-tt.cue", url );
+
+    }
+
+
 }

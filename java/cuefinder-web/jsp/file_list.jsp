@@ -3,15 +3,15 @@
 <body>
 	<p>This is file list:</p>
  <table>
-      <c:forEach var="file" items="${file_list}">
+      <c:forEach var="fItem" items="${file_list}">
         <tr>
 <td>
 <c:choose> 
-  <c:when test="${file.directory}" > 
-      <a href="file_list.html?fn=${file.name}">${file.name}</a>
+  <c:when test="${fItem.directory}" >
+      <a href="file_list.html?fn=${fItem.file.absolutePath}">${fItem.file.name}</a>
   </c:when>
   <c:otherwise>
-  <c:out value="${file.name}"/> 
+  ${fItem.length}  ${fItem.file.name} <a href="process_file.html?fn=${fItem.file.absolutePath}">Process</a> 
   </c:otherwise> 
 </c:choose> 
 </td>
