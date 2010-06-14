@@ -37,7 +37,7 @@
 <target name="test">
     <junit>
       <classpath refid="build.classpath"/>
-      <test name="CueFinderTest"/>
+      <test name="ru.cuefinder.CueFinderTest"/>
     </junit>
 </target>
 

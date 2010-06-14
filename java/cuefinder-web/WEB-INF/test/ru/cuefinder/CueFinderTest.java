@@ -1,25 +1,24 @@
+package ru.cuefinder;
+
 import junit.framework.TestCase;
 import ru.cuefinder.ASOTParser;
 import ru.cuefinder.CueFinder;
 import ru.cuefinder.CueFinderFactory;
 import ru.cuefinder.MagicIslandParser;
 import ru.cuefinder.MarkusShultzParser;
+import ru.cuefinder.TiestoParser;
 import ru.cuefinder.VonycParser;
 
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by IntelliJ IDEA.
- * User: chernyh
- * Date: 05.06.2010
- * Time: 23:28:27
- * To change this template use File | Settings | File Templates.
- */
+
 public class CueFinderTest extends TestCase
 {
 
@@ -146,7 +145,7 @@ public class CueFinderTest extends TestCase
     }
 
 
-     public void test_ASOT_parse_cue_url() throws Exception
+    public void test_ASOT_parse_cue_url() throws Exception
     {
         String file_name = "Armin van Buuren presents - A State of Trance Episode 455.mp3";
         ASOTParser cf = new ASOTParser( file_name );
@@ -156,6 +155,13 @@ public class CueFinderTest extends TestCase
         String url = cf.find_url_to_cue_file( html );
         assertEquals( "download.php?type=cue&folder=asot&filename=01-armin_van_buuren_-_a_state_of_trance_455_%28di.fm%29_06-05-2010-tt.cue", url );
 
+    }
+
+    public void testEncoding() throws Exception
+    {
+//        Map m = Charset.availableCharsets();
+        TiestoParser cf = new TiestoParser( "/home/chernyh/tmp/Club Life 167 (2010-06-11) part 1 [TALiON].mp3" );
+            cf.download_cue();
     }
 
 
