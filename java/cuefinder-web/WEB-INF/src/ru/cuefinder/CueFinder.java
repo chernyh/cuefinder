@@ -1,9 +1,11 @@
 package ru.cuefinder;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -11,6 +13,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -62,7 +72,7 @@ public abstract class CueFinder
     }
 
 
-    protected String get( String url ) throws IOException
+    protected byte[] get( String url ) throws IOException
     {
         log.add( "downloading url: " + url );
         HttpClient hc = new DefaultHttpClient();
@@ -71,8 +81,11 @@ public abstract class CueFinder
         HttpResponse resp = hc.execute( get );
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        resp.getEntity().writeTo( baos );
-        return new String( baos.toByteArray() );
+        HttpEntity entity = resp.getEntity();
+        entity.writeTo( baos );
+
+        return baos.toByteArray();
+
     }
 
     public String find_url_to_cue_file( String html ) throws Exception
@@ -91,20 +104,35 @@ public abstract class CueFinder
 
     protected abstract String parse_url_to_cue_file( String html, String release_no, int part_no );
 
+    private String decode( byte[] bytes ) throws Exception
+    {
+        if( getForcedCueCharset() == null )
+        {
+            return new String( bytes );
+        }
+        Charset charset = Charset.forName( getForcedCueCharset() );
+        CharsetDecoder decoder = charset.newDecoder();
+        CharBuffer cbuf = decoder.decode( ByteBuffer.wrap( bytes ) );
+        return cbuf.toString();
+    }
+
     protected String download_cue() throws Exception
     {
         if( release_no != null )
         {
-            String html = get( CUENATION_URL_PREFIX + get_radioshow_folder_path() );
+            String html = new String( get( CUENATION_URL_PREFIX + get_radioshow_folder_path() ) );
             String cue_url = CUENATION_URL_PREFIX + find_url_to_cue_file( html );
             log.add( "cueUrl is " + cue_url + ", downloading" );
-            String content = get( cue_url );
+            byte[] content = get( cue_url );
             File f = new File( cue_file_name );
 
-            System.out.println( "Cue file:\n" + content );
-            FileOutputStream fos = new FileOutputStream( f );
-            fos.write( content.getBytes() );
-            fos.close();
+            String decoded = decode( content );
+            System.out.println( "Cue file:\n" + decoded );
+
+            Writer out = new OutputStreamWriter( new FileOutputStream( f ), "UTF-8" );
+
+            out.write( decoded );
+            out.close();
             log.add( "cue file saved to " + cue_file_name );
             return cue_file_name;
         } else
@@ -112,6 +140,11 @@ public abstract class CueFinder
             log.add( "release no could not be parsed, sorry" );
             return null;
         }
+    }
+
+    protected String getForcedCueCharset()
+    {
+        return null;
     }
 
     protected abstract String get_radioshow_folder_path();
@@ -183,27 +216,12 @@ public abstract class CueFinder
             if( part_no == 0 )
             {
 //                mp3File.delete();
-            } else
+            }
+            //else
 //            log.add("mp3 file not deleted (radioshows containing more than 1 part not yet well tested)");
 //                mp3File.delete();
 
-                new File( cue_file_name ).delete();
-        }
-    }
-
-    /**
-     * convert filenames to UTF-8 , f.e. Tiesto mp3's has specific symbols
-     */
-    void call_convmv( String mp3_file_name ) throws InterruptedException, IOException
-    {
-        String dir = new File( mp3_file_name ).getParentFile().getAbsolutePath();
-        String cmd = "convmv -f ISO_8859-16 -t UTF-8 \"" + dir + "\"/*.mp3 --notest";
-        log.add( "converting filenames to UTF-8: " + cmd );
-        Process proc = Runtime.getRuntime().exec( cmd );
-        proc.waitFor();
-        if( proc.exitValue() != 0 )
-        {
-            log.add( "could not convert filenames" );
+//                new File( cue_file_name ).delete();
         }
     }
 
@@ -213,7 +231,6 @@ public abstract class CueFinder
         if( cue_file != null )
         {
             call_mp3splt( cue_file_name, mp3Filename );
-            call_convmv( mp3Filename );
         } else
         {
             log.add( "could not find cue sheet for: " + mp3Filename );
