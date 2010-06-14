@@ -216,12 +216,13 @@ public abstract class CueFinder
             if( part_no == 0 )
             {
 //                mp3File.delete();
-            }
-            //else
+            } else
+            {
 //            log.add("mp3 file not deleted (radioshows containing more than 1 part not yet well tested)");
 //                mp3File.delete();
+            }
+            new File( cue_file_name ).delete();
 
-//                new File( cue_file_name ).delete();
         }
     }
 
