@@ -28,17 +28,16 @@ public class MarkusShultzParser extends CueFinder
     public String parse_release_no() throws Exception
     {
         release_no = getFirstMatch( "Global DJ Broadcast \\((.*?)\\).*\\.mp3", mp3Filename );
-        if( release_no != null )
-        {
-            return release_no;
-        }
-        log.add( "trying 2nd pattern" );
-
-        release_no = getFirstMatch( "\\((.*)\\)\\.mp3", mp3Filename );
         if( release_no == null )
         {
-            log.add( "trying 3rd pattern" );
-            release_no = getFirstMatch( "Tour_(.*_.*_.*)\\.mp3", mp3Filename );
+            log.add( "trying 2nd pattern" );
+
+            release_no = getFirstMatch( "\\((.*)\\)\\.mp3", mp3Filename );
+            if( release_no == null )
+            {
+                log.add( "trying 3rd pattern" );
+                release_no = getFirstMatch( "Tour_(.*_.*_.*)\\.mp3", mp3Filename );
+            }
         }
 
         release_no = release_no.replaceAll( "[_-]", " " );
@@ -48,14 +47,17 @@ public class MarkusShultzParser extends CueFinder
         SimpleDateFormat df = new SimpleDateFormat( "dd MM yyyy" );
         try
         {
-
             d = df.parse( release_no );
+            if( d.before( new Date( 2000, 1, 1 ) ) || d.before( new Date( 2020, 1, 1 ) ) )
+            {
+                throw new ParseException( "bad date", -1 );
+            }
         }
         catch( ParseException e )
         {
             try
             {
-                SimpleDateFormat df2 = new SimpleDateFormat( "yyyy mm dd" );
+                SimpleDateFormat df2 = new SimpleDateFormat( "yyyy MM dd" );
                 d = df2.parse( release_no );
             }
             catch( ParseException e2 )

@@ -74,6 +74,23 @@ public class CueFinderTest extends TestCase
         assertEquals( "27-05-2010", rel_no );
     }
 
+    public void test_ParseGDJBRelease5() throws Exception
+    {
+        String file_name = "Markus Schulz presents - Global DJ Broadcast (27 May 2010).mp3";
+        CueFinder cf = new MarkusShultzParser( file_name );
+        String rel_no = cf.parse_release_no();
+        assertEquals( "27-05-2010", rel_no );
+    }
+
+    public void test_ParseGDJBRelease6() throws Exception
+    {
+        String file_name = "Markus Schulz presents - Global DJ Broadcast World Tour (10 June 2010).mp3";
+        CueFinder cf = new MarkusShultzParser( file_name );
+        String rel_no = cf.parse_release_no();
+        assertEquals( "10-06-2010", rel_no );
+    }
+
+
     public void test_CueFinderFactory()
     {
         String file_name = "Markus Schulz presents - Global DJ Broadcast WMC Special (25 March 2010).mp3";
@@ -157,12 +174,7 @@ public class CueFinderTest extends TestCase
 
     }
 
-    public void testEncoding() throws Exception
-    {
-//        Map m = Charset.availableCharsets();
-        TiestoParser cf = new TiestoParser( "/home/chernyh/tmp/Club Life 167 (2010-06-11) part 1 [TALiON].mp3" );
-            cf.download_cue();
-    }
+
 
 
 }
