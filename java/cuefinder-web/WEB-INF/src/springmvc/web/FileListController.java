@@ -3,6 +3,8 @@ package springmvc.web;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.File;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -28,6 +30,48 @@ public class FileListController implements Controller
         }
     }
 
+    enum SortingMode
+    {
+        name,
+        modDate
+    }
+
+    private class FileComparator implements Comparator
+    {
+        private SortingMode sm;
+        private boolean sortAscending;
+
+        public FileComparator( SortingMode sm, boolean sortAscending )
+        {
+            this.sm = sm;
+            this.sortAscending = sortAscending;
+        }
+
+        private int result;
+
+        public int compare( Object o1, Object o2 )
+        {
+            FileItem w1 = ( FileItem ) o1;
+            FileItem w2 = ( FileItem ) o2;
+            switch( sm )
+            {
+                case name:
+                    result = w1.getFile().getName().compareTo( w2.getFile().getName() );
+                    break;
+                case modDate:
+                    result = Long.valueOf( w1.getFile().lastModified() ).compareTo( Long.valueOf( w2.getFile().lastModified() ) );
+                    break;
+                default:
+                    result = 0;
+
+            }
+            if( !sortAscending )
+                result *= -1;
+            return result;
+        }
+    }
+
+
     public ModelAndView handleRequest( HttpServletRequest request,
                                        HttpServletResponse response ) throws ServletException, IOException
     {
@@ -45,9 +89,24 @@ public class FileListController implements Controller
             files.add( fi );
         }
 
+        SortingMode sm = SortingMode.modDate;
+        try
+        {
+            sm = SortingMode.valueOf( request.getParameter( "fn" ) );
+        }
+        catch( IllegalArgumentException e )
+        {
+            e.printStackTrace();
+        }
+
+        String desc = request.getParameter( "desc" );
+        boolean ascending = desc != null && !"yes".equals( desc );
+        Collections.sort( files, new FileComparator( sm, ascending ) );
+
         ModelAndView modelAndView = new ModelAndView( "file_list" );
         modelAndView.addObject( "file_list", files );
 
         return modelAndView;
     }
+
 }

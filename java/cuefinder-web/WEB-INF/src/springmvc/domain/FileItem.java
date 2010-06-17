@@ -1,6 +1,7 @@
 package springmvc.domain;
 
 import java.io.File;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -44,5 +45,10 @@ public class FileItem
     public void setDirectory( boolean directory )
     {
         isDirectory = directory;
+    }
+
+    public Date getLastModified()
+    {
+        return new Date( file.lastModified() );
     }
 }
