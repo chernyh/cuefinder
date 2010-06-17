@@ -29,7 +29,7 @@ public class ASOTParser extends CueFinder
 
     public String parse_release_no() throws Exception
     {
-        release_no = getFirstMatch( "Episode ([0-9]+).*\\.mp3", mp3Filename );
+        release_no = getFirstMatch( "Episode ([0-9]+)\\.mp3", mp3Filename );
         if( release_no != null )
         {
             return release_no;

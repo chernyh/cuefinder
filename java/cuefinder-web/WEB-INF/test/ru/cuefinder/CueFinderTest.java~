@@ -88,10 +88,6 @@ public class CueFinderTest extends TestCase
         CueFinder cf = new MarkusShultzParser( file_name );
         String rel_no = cf.parse_release_no();
         assertEquals( "10-06-2010", rel_no );
-        String html = "<a href=\"download.php?type=cue&folder=gdjb&filename=01-markus_schulz_-_global_dj_broadcast_world_tour_moscow-%28DI.FM%29-2010-06-10-mt.cue\"><img src=\"layout/download.png\" alt=\"Download!\" /></a> <a href=\"?page=tracklist&folder=gdjb&filename=01-markus_schulz_-_global_dj_broadcast_world_tour_moscow-%28DI.FM%29-2010-06-10-mt.cue\"> Global DJ Broadcast (2010-06-10) (World Tour - Moscow, Russia) [PS]</a><br /> ";
-        String url = cf.find_url_to_cue_file( html );
-        assertEquals( "download.php?type=cue&folder=gdjb&filename=01-markus_schulz_-_global_dj_broadcast_world_tour_moscow-%28DI.FM%29-2010-06-10-mt.cue", url );
-
     }
 
 

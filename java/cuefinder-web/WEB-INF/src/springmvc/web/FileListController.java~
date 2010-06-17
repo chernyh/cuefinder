@@ -1,5 +1,6 @@
 package springmvc.web;
 
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.File;
 import java.util.List;
@@ -11,24 +12,41 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.Controller;
+import springmvc.domain.FileItem;
 
-public class FileListController implements Controller {
+public class FileListController implements Controller
+{
 
-	public ModelAndView handleRequest(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+    public static final String HOME_DIR = "/home/chernyh";
 
-String homeDirPath ="/home/chernyh";
-String requestedPath= request.getParameter("fn");
-		File homeDir = new File(homeDirPath + (requestedPath==null?"":"/"+requestedPath));
-		List files = new ArrayList();
-		for(File fn: homeDir.listFiles() )
-		{
-		    files.add(fn);
-		}
-		
-		ModelAndView modelAndView = new ModelAndView("file_list");
-		modelAndView.addObject("file_list", files);
-		
-		return modelAndView;
-	}
+    private class _50MBFilter implements FileFilter
+    {
+        public boolean accept( File file )
+        {
+            return file.isDirectory() || ( file.length() > 50000000 );//50MB minimum
+        }
+    }
+
+    public ModelAndView handleRequest( HttpServletRequest request,
+                                       HttpServletResponse response ) throws ServletException, IOException
+    {
+
+
+        String requestedPath = request.getParameter( "fn" );
+        requestedPath = requestedPath == null ? HOME_DIR : requestedPath;
+
+        File selectedDir = new File( requestedPath );
+        List files = new ArrayList();
+        for( File fn : selectedDir.listFiles( new _50MBFilter() ) )
+        {
+            FileItem fi = new FileItem();
+            fi.setFile( fn );
+            files.add( fi );
+        }
+
+        ModelAndView modelAndView = new ModelAndView( "file_list" );
+        modelAndView.addObject( "file_list", files );
+
+        return modelAndView;
+    }
 }

@@ -27,7 +27,7 @@ public class MarkusShultzParser extends CueFinder
 String[] datePart= asotNo.split("-");
          url = getFirstMatch( "(download.php[?]type=cue.*-" + datePart[2] + "-" + datePart[1]+ "-" + datePart[0]+ "-.*\\.cue)\\\"\\>\\<img", html );
       }
-      return url;
+      return nurl;
     }
 
 

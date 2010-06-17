@@ -17,7 +17,8 @@ import springmvc.domain.FileItem;
 public class FileListController implements Controller
 {
 
-    public static final String HOME_DIR = "/home/chernyh";
+    //public static final String HOME_DIR = "/home/chernyh";
+    public static final String HOME_DIR = "/mnt/multimedia/_RADIOSHOW_";
 
     private class _50MBFilter implements FileFilter
     {
