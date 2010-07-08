@@ -5,7 +5,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -17,12 +16,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,19 +29,13 @@ public abstract class CueFinder
     int part_no;
     String cue_file_name;
 
-    List<String> log = new ArrayList<String>();
+    Logger log = new Logger();
+
 
     public CueFinder( String mp3Filename )
     {
         this.mp3Filename = mp3Filename;
-        try
-        {
-            this.release_no = parse_release_no();
-        }
-        catch( Exception e )
-        {
-            e.printStackTrace();
-        }
+        this.release_no = parse_release_no();
         this.part_no = parse_part_no();
 
         File mp3File = new File( mp3Filename );
