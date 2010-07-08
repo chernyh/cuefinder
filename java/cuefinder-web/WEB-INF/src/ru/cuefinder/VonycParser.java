@@ -1,12 +1,5 @@
 package ru.cuefinder;
 
-/**
- * Created by IntelliJ IDEA.
- * User: chernyh
- * Date: 05.06.2010
- * Time: 2:41:46
- * To change this template use File | Settings | File Templates.
- */
 public class VonycParser extends CueFinder
 {
     public VonycParser( String mp3Filename )
@@ -27,7 +20,7 @@ public class VonycParser extends CueFinder
     }
 
 
-    public String parse_release_no() throws Exception
+    public String parse_release_no()
     {
         release_no = getFirstMatch( "sessions_([0-9]+)-", mp3Filename );
         log.add( "Vonic release is '" + release_no + "'" );

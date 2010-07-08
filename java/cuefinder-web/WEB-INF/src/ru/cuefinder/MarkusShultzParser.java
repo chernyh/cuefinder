@@ -21,17 +21,17 @@ public class MarkusShultzParser extends CueFinder
     @Override
     protected String parse_url_to_cue_file( String html, String asotNo, int part_no )
     {
-      String url = getFirstMatch( "(download.php[?]type=cue.*-" + asotNo + "-.*\\.cue)\\\"\\>\\<img", html );
-      if(url == null)
-      {
-String[] datePart= asotNo.split("-");
-         url = getFirstMatch( "(download.php[?]type=cue.*-" + datePart[2] + "-" + datePart[1]+ "-" + datePart[0]+ "-.*\\.cue)\\\"\\>\\<img", html );
-      }
-      return url;
+        String url = getFirstMatch( "(download.php[?]type=cue.*-" + asotNo + "-.*\\.cue)\\\"\\>\\<img", html );
+        if( url == null )
+        {
+            String[] datePart = asotNo.split( "-" );
+            url = getFirstMatch( "(download.php[?]type=cue.*-" + datePart[ 2 ] + "-" + datePart[ 1 ] + "-" + datePart[ 0 ] + "-.*\\.cue)\\\"\\>\\<img", html );
+        }
+        return url;
     }
 
 
-    public String parse_release_no() throws Exception
+    public String parse_release_no()
     {
         release_no = getFirstMatch( "Global DJ Broadcast \\((.*?)\\).*\\.mp3", mp3Filename );
         if( release_no == null )
@@ -45,11 +45,15 @@ String[] datePart= asotNo.split("-");
                 release_no = getFirstMatch( "Tour_(.*_.*_.*)\\.mp3", mp3Filename );
             }
         }
+        if( release_no == null )
+        {
+            return null;
+        }
 
         release_no = release_no.replaceAll( "[_-]", " " );
 
 
-        Date d;
+        Date d = null;
         SimpleDateFormat df = new SimpleDateFormat( "dd MM yyyy" );
         try
         {
@@ -70,16 +74,20 @@ String[] datePart= asotNo.split("-");
             {
                 SimpleDateFormat df3 = new SimpleDateFormat( "dd MMMM yyyy", Locale.US );
 
-                d = df3.parse( release_no );
+                try
+                {
+                    d = df3.parse( release_no );
+                }
+                catch( ParseException e3 )
+                {
+                    e3.printStackTrace();
+                }
 
             }
         }
-
 
         release_no = new SimpleDateFormat( "dd-MM-yyyy" ).format( d );
         return release_no;
 
     }
-
-
 }

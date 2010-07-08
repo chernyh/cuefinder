@@ -33,7 +33,7 @@ public class TiestoParser extends CueFinder
     }
 
 
-    public String parse_release_no() throws Exception
+    public String parse_release_no()
     {
         release_no = getFirstMatch( "Club Life ([0-9]+) ", mp3Filename );
         log.add( "Tiesto release is '" + release_no + "'" );

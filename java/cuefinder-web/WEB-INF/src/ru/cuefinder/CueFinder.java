@@ -42,29 +42,19 @@ public abstract class CueFinder
         try
         {
             this.release_no = parse_release_no();
-        } catch( Exception e )
+        }
+        catch( Exception e )
         {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         this.part_no = parse_part_no();
 
         File mp3File = new File( mp3Filename );
         File parent = mp3File.getParentFile();
         this.cue_file_name = ( parent == null ? "" : parent.getAbsolutePath() + "/" ) + mp3File.getName() + ".cue";
-
-//    path_to_config=Etc.getpwuid.dir+"/.cuefinder"
-//    if(!File.exist?(path_to_config))
-//      raise "Please provide proxy settings in ~/.cuefinder"
-//    end
-//    props = load_properties(path_to_config)
-//    @proxy_host =props["proxy_host"];
-//    @proxy_port =props["proxy_port"];
-//    @proxy_set=props["proxy_set"];
-//    puts "using proxy: #{@proxy_host}:#{@proxy_port} , set: #{@proxy_set}"
-
     }
 
-    public abstract String parse_release_no() throws Exception;
+    public abstract String parse_release_no();
 
     protected int parse_part_no()
     {
@@ -135,7 +125,8 @@ public abstract class CueFinder
             out.close();
             log.add( "cue file saved to " + cue_file_name );
             return cue_file_name;
-        } else
+        }
+        else
         {
             log.add( "release no could not be parsed, sorry" );
             return null;
@@ -162,7 +153,9 @@ public abstract class CueFinder
     {
         String output_format = "@n+@p+@t";
         if( part_no != 0 )
+        {
             output_format = part_no + output_format;
+        }
 
         return output_format;
     }
@@ -201,24 +194,26 @@ public abstract class CueFinder
         log.add( cmd );
 
         if( executeCommand( mp3File.getParentFile(),
-                "mp3splt",
-                "-Q",// hangs up without it
-                "-o",
-                output_format,
-                "-c",
-                cueFile.getName(),
-                mp3File.getName()
+                            "mp3splt",
+                            "-Q",// hangs up without it
+                            "-o",
+                            output_format,
+                            "-c",
+                            cueFile.getName(),
+                            mp3File.getName()
         ) != 0 )
         {
             log.add( "could not split mp3 file: " + mp3_file_name );
-        } else
+        }
+        else
         {
             if( part_no == 0 )
             {
                 mp3File.delete();
-            } else
+            }
+            else
             {
-            log.add("mp3 file not deleted (radioshows containing more than 1 part not yet well tested)");
+                log.add( "mp3 file not deleted (radioshows containing more than 1 part not yet well tested)" );
 //                mp3File.delete();
             }
             new File( cue_file_name ).delete();
@@ -226,17 +221,6 @@ public abstract class CueFinder
         }
     }
 
-    public void process() throws Exception, InterruptedException
-    {
-        String cue_file = download_cue();
-        if( cue_file != null )
-        {
-            call_mp3splt( cue_file_name, mp3Filename );
-        } else
-        {
-            log.add( "could not find cue sheet for: " + mp3Filename );
-        }
-    }
 
     String getFirstMatch( String regex, String input )
     {
@@ -245,8 +229,11 @@ public abstract class CueFinder
         if( m.find() )
         {
             return m.group( 1 ).replaceAll( "&amp;", "&" );
-        } else
+        }
+        else
+        {
             return null;
+        }
 
     }
 
@@ -258,6 +245,19 @@ public abstract class CueFinder
     public String getOutput()
     {
         return log.toString();
+    }
+
+    public void process() throws Exception, InterruptedException
+    {
+        String cue_file = download_cue();
+        if( cue_file != null )
+        {
+            call_mp3splt( cue_file_name, mp3Filename );
+        }
+        else
+        {
+            log.add( "could not find cue sheet for: " + mp3Filename );
+        }
     }
 
 }

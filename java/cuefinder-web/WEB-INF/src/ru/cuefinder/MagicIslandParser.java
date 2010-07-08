@@ -14,7 +14,7 @@ public class MagicIslandParser extends CueFinder
     }
 
 
-    public String parse_release_no() throws Exception
+    public String parse_release_no() 
     {
         String match = getFirstMatch( "Episode ([0-9]+)", mp3Filename );
         if( match != null )
