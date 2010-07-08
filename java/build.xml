@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="jar">
+
+    <property name="src.dir" value="src"/>
+    <property name="test.dir" value="test"/>
+    
+    <property name="out.dir" value="out"/>
+    <property name="build.dir" value="out/classes"/>
+        
+    <property name="cuefinder.jar" value="${out.dir}/cuefinder.jar"/>
+
+    <path id="build.classpath">
+        <fileset dir="lib">
+            <include name="*.jar"/>
+        </fileset>
+        <pathelement path="${build.dir}"/>
+    </path>
+
+
+    <target name="build">
+        <mkdir dir="${build.dir}"/>
+        <javac destdir="${build.dir}" source="1.5" target="1.5" debug="true" deprecation="false" optimize="false"
+               failonerror="true" includeantruntime="false">
+            <src path="${src.dir};${test.dir}"/>
+            <classpath refid="build.classpath"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="build">
+        <jar destfile="${cuefinder.jar}"
+             basedir="${build.dir}"
+             includes="ru/cuefinder/**" />
+    </target>
+
+    <target name="clean" description="Clean output directories">
+        <delete dir="${out.dir}"/>
+    </target>
+
+    <target name="test">
+        <junit printsummary="yes">
+            <formatter type="plain"/>
+            <classpath refid="build.classpath"/>
+            <test name="ru.cuefinder.CueFinderTest"/>
+        </junit>
+    </target>
+
+
+</project>
