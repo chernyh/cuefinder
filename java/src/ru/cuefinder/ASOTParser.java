@@ -20,17 +20,21 @@ public class ASOTParser extends CueFinder
     }
 
 
-    public String parse_release_no() 
+    public String parse_release_no()
     {
         release_no = getFirstMatch( "Episode ([0-9]+).*\\.mp3", mp3Filename );
-        if( release_no != null )
+        if( release_no == null )
         {
-            return release_no;
+            release_no = getFirstMatch( "Trance[_ ](([0-9]+))[_ -]", mp3Filename );
         }
-        release_no = getFirstMatch( "Trance[_ ](([0-9]+))[_ -]", mp3Filename );
+
+        if( release_no == null )
+        {
+            release_no = getFirstMatch( "([0-9]{3}).mp3", mp3Filename );
+        }
+
         log.add( "ASOT release is '" + release_no + "'" );
         return release_no;
-
     }
 
 

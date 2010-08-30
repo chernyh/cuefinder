@@ -23,7 +23,7 @@ public class MagicIslandParser extends CueFinder
         }
         log.add( "trying 2nd pattern" );
 
-        match = getFirstMatch( "_([0-9]+)-", mp3Filename );
+        match = getFirstMatch( "[_ ]+([0-9]{3})[ _-]+", mp3Filename );
         log.add( "Magic Island release is '" + match + "'" );
         return match;
 
