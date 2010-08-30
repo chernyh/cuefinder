@@ -32,7 +32,7 @@ public class MagicIslandParser extends CueFinder
     @Override
     protected String parse_url_to_cue_file( String html, String asotNo, int part_no )
     {
-        release_no = getFirstMatch( "(download.php[?]type=cue.*music_for_balearic_people_" + asotNo + "[_-].*\\.cue)\\\"\\>\\<img", html );
+        release_no = getFirstMatch( "(download.php[?]type=cue.*magicisland.*" + asotNo + ".*\\.cue)\\\"\\>\\<img", html );
         if( release_no!= null )
         {
             return release_no;
