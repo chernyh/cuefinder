@@ -90,6 +90,12 @@ public class CueFinderTest extends TestCase
         file_name = "01-paul_van_dyk_-_vonyc_sessions_188-sat-04-01-2010-talion.mp3";
         assertTrue( CueFinderFactory.makeCueFinder( file_name ) instanceof VonycParser );
 
+        file_name = "Ferry Corsten presents - Corsten's Countdown 165 (25 August 2010).mp3";
+        assertTrue( CueFinderFactory.makeCueFinder( file_name ) instanceof CorstenParser );
+
+        file_name = "Aly and Fila - Future Sound Of Egypt 148.mp3";
+        assertTrue( CueFinderFactory.makeCueFinder( file_name ) instanceof AlyAndFilaParser );
+
     }
 
     public void test_MagicIsland_parse_release_no() throws Exception
@@ -191,6 +197,22 @@ public class CueFinderTest extends TestCase
         ASOTParser cf = new ASOTParser( file_name );
         String rel_no = cf.parse_release_no();
         assertEquals( "471", rel_no );
+    }
+
+    public void test_Corsten_parse_name() throws Exception
+    {
+        String file_name = "Ferry Corsten presents - Corsten's Countdown 165 (25 August 2010).mp3";
+        CorstenParser cf = new CorstenParser( file_name );
+        String rel_no = cf.parse_release_no();
+        assertEquals( "165", rel_no );
+    }
+
+    public void test_AlyFila_parse_name() throws Exception
+    {
+        String file_name = "Aly and Fila - Future Sound Of Egypt 148.mp3";
+        CorstenParser cf = new CorstenParser( file_name );
+        String rel_no = cf.parse_release_no();
+        assertEquals( "148", rel_no );
     }
 
 

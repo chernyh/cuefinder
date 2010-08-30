@@ -1,12 +1,5 @@
 package ru.cuefinder;
 
-/**
- * Created by IntelliJ IDEA.
- * User: chernyh
- * Date: 05.06.2010
- * Time: 23:05:09
- * To change this template use File | Settings | File Templates.
- */
 public class CueFinderFactory
 {
     public static CueFinder makeCueFinder( String file_name )
@@ -30,6 +23,15 @@ public class CueFinderFactory
         if( file_name.contains( "Vonyc" ) || file_name.contains( "vonyc" ) )
         {
             return new VonycParser( file_name );
+        }
+
+        if( file_name.contains( "Corsten" ) )
+        {
+            return new CorstenParser( file_name );
+        }
+        if( file_name.contains( "Future Sound Of Egypt" ) )
+        {
+            return new AlyAndFilaParser( file_name );
         }
 
         return null;
